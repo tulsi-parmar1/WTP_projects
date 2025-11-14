@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UG Degree Information Form - GMCA</title>
+
+    <style>
+      /* ===== GLOBAL STYLES ===== */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        /* background-color: rgb(213, 213, 219); */
+        background-color: rgb(171, 131, 75);
+      }
+
+      main {
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 900px;
+      }
+
+      /* ===== HEADER ===== */
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .header h1 {
+        /* color: blue; */
+        color: green;
+        font-size: 2em;
+      }
+
+      .header p {
+        color: rgb(109, 106, 106);
+        font-size: 1em;
+      }
+
+      /* ===== FORM STYLING ===== */
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      fieldset {
+        width: 100%;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 20px;
+        border: 1px solid gray;
+        background: white;
+        box-sizing: border-box;
+      }
+
+      legend {
+        font-weight: bold;
+        color: #003366;
+
+        font-size: 1.1em;
+      }
+
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: 600;
+      }
+
+      input,
+      select {
+        width: 100%;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 5px 12px;
+        box-sizing: border-box;
+        margin-top: 6px;
+        font-size: 1em;
+      }
+
+      /* ===== BUTTON ===== */
+      .btn {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .btn button {
+        width: 220px;
+        height: 45px;
+        color: white;
+        /* background-color: blue; */
+        background-color: green;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.05em;
+        transition: 0.3s;
+      }
+
+      .btnbutton:hover {
+        background-color: rgb(100, 100, 180);
+        cursor: pointer;
+      }
+
+      /* ===== INFO BOX ===== */
+      #info {
+        text-align: center;
+        /* background-color: #003366; */
+        color: white;
+        padding: 8px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        font-size: 0.95em;
+      }
+
+      /* ===== RESPONSIVE DESIGN ===== */
+      @media (max-width: 992px) {
+        .container {
+          max-width: 700px;
+        }
+
+        .header h1 {
+          font-size: 1.8em;
+        }
+      }
+
+      @media (max-width: 768px) {
+        fieldset {
+          width: 90%;
+        }
+
+        input,
+        select {
+          height: 38px;
+        }
+
+        .header h1 {
+          font-size: 1.6em;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          background-color: white;
+        }
+
+        fieldset {
+          width: 100%;
+          padding: 15px;
+          margin: 10px 0;
+          border-radius: 15px;
+        }
+
+        .header h1 {
+          font-size: 1.4em;
+        }
+
+        .header p {
+          font-size: 0.9em;
+        }
+
+        input,
+        select {
+          font-size: 0.9em;
+          height: 35px;
+        }
+
+        .btn button {
+          width: 100%;
+          height: 42px;
+        }
+      }
+    </style>
+  </head>
+
+  <body onload="funLoad()">
+    <main>
+      <div class="container">
+        <div class="header">
+          <h1>Undergraduate Degree Information</h1>
+          <p>
+            Please fill in your undergraduate degree details. All fields marked
+            <strong>*</strong> are required.
+          </p>
+        </div>
+
+        <form
+          action="#"
+          method="post"
+          id="ugForm"
+          enctype="multipart/form-data"
+        >
+          <fieldset>
+            <legend>Personal Information</legend>
+
+            <label for="fullname">Full Name <strong>*</strong></label>
+            <input
+              type="text"
+              id="fullname"
+              name="fullname"
+              placeholder="name"
+              required
+            />
+
+            <label for="email">Email <strong>*</strong></label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="name@example.com"
+              required
+            />
+
+            <label for="phone">Phone Number <strong>*</strong></label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              pattern="[0-9]{10}"
+              placeholder="10 digit mobile"
+              required
+            />
+          </fieldset>
+
+          <fieldset>
+            <legend>Degree Details</legend>
+
+            <label for="college"
+              >College / Institute Name <strong>*</strong></label
+            >
+            <input
+              type="text"
+              id="college"
+              name="college"
+              placeholder="Name of college"
+              required
+            />
+
+            <label for="degree">Degree <strong>*</strong></label>
+            <select id="degree" name="degree" onchange="funChange()" required>
+              <option value="" disabled selected>-- Select degree --</option>
+              <option value="BCom">B.Com</option>
+              <option value="BBA">BBA</option>
+              <option value="BCA">BCA</option>
+              <option value="BA">BA</option>
+              <option value="BSc">B.Sc</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <label for="special">Major / Specialization</label>
+            <input
+              type="text"
+              id="special"
+              name="special"
+              placeholder="e.g., Accounting, Computer Applications"
+            />
+
+            <label for="enroll">Enrollment / Roll Number</label>
+            <input
+              type="text"
+              id="enroll"
+              name="enroll"
+              placeholder="Enrollment or roll number"
+            />
+
+            <label for="university">University</label>
+            <input
+              type="text"
+              id="university"
+              name="university"
+              placeholder="Affiliating university"
+            />
+
+            <label for="startyear">Start Year</label>
+            <input
+              type="number"
+              id="startyear"
+              name="startyear"
+              min="1950"
+              max="2030"
+              placeholder="e.g., 2019"
+            />
+
+            <label for="passyear">Year of Passing <strong>*</strong></label>
+            <input
+              type="number"
+              id="passyear"
+              name="passyear"
+              min="1950"
+              max="2050"
+              required
+              placeholder="e.g., 2025"
+            />
+          </fieldset>
+
+          <div class="btn">
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <div id="info">Resize the window to see size updates</div>
+
+    <script>
+      const inputs = document.querySelectorAll("input");
+      const form = document.getElementById("ugForm");
+
+      // KEY EVENTS
+      document.addEventListener("keydown", (e) => {
+        document.getElementById(
+          "info"
+        ).innerHTML = `Key pressed: <b>${e.key}</b>`;
+      });
+
+      document.addEventListener("keyup", (e) => {
+        document.getElementById(
+          "info"
+        ).innerHTML = `Key released: <b>${e.key}</b>`;
+      });
+
+      // FORM EVENT
+      function funChange() {
+        const selected = document.getElementById("degree").value;
+        if (selected !== "") {
+          alert("You selected: " + selected);
+        }
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        alert("Form Submitted Successfully!");
+      });
+
+      //  MOUSE EVENTS
+      inputs.forEach((input) => {
+        input.addEventListener("mouseover", () => {
+          input.style.backgroundColor = "lightblue";
+        });
+
+        input.addEventListener("mouseout", () => {
+          input.style.backgroundColor = "white";
+        });
+      });
+
+      // WINDOW RESIZE EVENT
+      window.onresize = function () {
+        // const width = window.innerWidth;
+        // const height = window.innerHeight;
+        alert("window resized");
+        // document.getElementById(
+        //   "info"
+        // ).innerHTML = `Window resized! Width: <b>${width}px</b>, Height: <b>${height}px</b>`;
+      };
+
+      // ===== PAGE LOAD EVENT =====
+      function funLoad() {
+        alert("Page loaded successfully!!");
+      }
+    </script>
+  </body>
+</html>
