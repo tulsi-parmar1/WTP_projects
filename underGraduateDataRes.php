@@ -1,4 +1,21 @@
-]<!DOCTYPE html>
+<?php
+session_start();
+if(!isset($_SESSION['user_id'])){
+    // user is NOT logged in
+    header("Location: login.php");
+    exit();
+}
+else{
+   $id = $_GET['id'] ?? null;
+  if ($id) {
+    include("db.php");
+    $query = "SELECT * FROM students_education WHERE id = $id";
+    $result = mysqli_query($conn, $query);
+    $data = mysqli_fetch_assoc($result);
+}
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -172,18 +189,22 @@
         </p>
       </div>
 
-      <form id="ugForm">
+      <form id="ugForm" method="POST" action="save.php">
           <legend>Personal Information</legend>
 
           <label for="fullname">Full Name <strong>*</strong></label>
-          <input type="text" name="fullname" id="fullname" />
+          <input type="text" name="fullname" id="fullname" 
+          value="<?php echo $data['fullname'] ?? ''; ?>"
+           />
           <small id="nameError"></small>
 
           <label for="email">Email <strong>*</strong></label>
           <input
             type="email"
             id="email"
+            value="<?php echo $data['email'] ?? ''; ?>"
             name="email"
+            
             placeholder="you@example.com"
           />
           <small id="emailError"></small>
@@ -193,6 +214,7 @@
             type="tel"
             id="phone"
             name="phone"
+            value="<?php echo $data['phone'] ?? ''; ?>"
             placeholder="10 digit mobile"
           />
           <small id="phoneError"></small>
@@ -206,29 +228,34 @@
           >
           <input
             type="text"
-            id="college"
-            name="college"
+            id="college_name"
+            value="<?php echo $data['college_name'] ?? ''; ?>"
+            name="college_name"
             placeholder="Name of your college"
           />
           <small id="collegeError"></small>
 
           <label for="degree">Degree <strong>*</strong></label>
-          <select id="degree" name="degree">
-            <option value="" disabled selected>-- Select degree --</option>
-            <option value="BCom">B.Com</option>
-            <option value="BBA">BBA</option>
-            <option value="BCA">BCA</option>
-            <option value="BA">BA</option>
-            <option value="BSc">B.Sc</option>
-            <option value="Other">Other</option>
-          </select>
+  
+    <select id="degree" name="degree">
+    <option value="" disabled <?php if(!isset($data['degree'])) echo 'selected'; ?>>
+        -- Select degree --
+    </option>
+    <option value="BCom" <?php if(($data['degree'] ?? '') == 'BCom') echo 'selected'; ?>>MCA</option>
+    <option value="BBA" <?php if(($data['degree'] ?? '') == 'BBA') echo 'selected'; ?>>MBA</option>
+    <option value="BCA" <?php if(($data['degree'] ?? '') == 'BCA') echo 'selected'; ?>>M.Com</option>
+    <option value="BA"  <?php if(($data['degree'] ?? '') == 'BA')  echo 'selected'; ?>>BA</option>
+    <option value="BSc" <?php if(($data['degree'] ?? '') == 'BSc') echo 'selected'; ?>>B.Sc</option>
+    <option value="Other" <?php if(($data['degree'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
+</select>
           <small id="degreeError"></small>
 
           <label for="startyear">Start Year</label>
           <input
             type="number"
-            id="startyear"
-            name="startyear"
+            id="start_year"
+            name="start_year"
+            value="<?php echo $data['start_year'] ?? ''; ?>"
             placeholder="e.g., 2020"
           />
           <small id="startError"></small>
@@ -236,9 +263,9 @@
           <label for="passyear">Year of Passing <strong>*</strong></label>
           <input
             type="number"
-            id="passyear"
-            name="passyear"
-            max="2025"
+            id="end_year"
+            value="<?php echo $data['end_year'] ?? ''; ?>"
+            name="end_year"
             placeholder="e.g., 2023"
           />
           <small id="passError"></small>
@@ -246,6 +273,7 @@
 
         <div class="btn">
           <button type="submit" id="submitBtn">Submit</button>
+          </button>
           <button type="reset">Reset</button>
         </div>
       </form>
@@ -254,10 +282,10 @@
       const fullnameEl = document.getElementById("fullname");
       const emailEl = document.getElementById("email");
       const phoneEl = document.getElementById("phone");
-      const collegeEl = document.getElementById("college");
+      const collegeEl = document.getElementById("college_name");
       const degreeEl = document.getElementById("degree");
-      const startyearEl = document.getElementById("startyear");
-      const passyearEl = document.getElementById("passyear");
+      const startyearEl = document.getElementById("start_year");
+      const passyearEl = document.getElementById("end_year");
 
       const form = document.getElementById("ugForm");
 
@@ -306,27 +334,65 @@
         clearError("degreeError");
       }
 
-      function validateYears() {
-        const start = startyearEl.value.trim();
-        const pass = passyearEl.value.trim();
+      // function validateYears() {
+      //   const start = startyearEl.value.trim();
+      //   const pass = passyearEl.value.trim();
 
-        if (!start)
-          return displayError("startError", "Start year is required.");
-        if (!/^(19|20)\d{2}$/.test(start))
-          return displayError("startError", "Enter a valid year (e.g., 2020).");
-        clearError("startError");
+      //   if (!start)
+      //     return displayError("startError", "Start year is required.");
+      //   if (!/^(19|20)\d{2}$/.test(start))
+      //     return displayError("startError", "Enter a valid year (e.g., 2020).");
+      //   clearError("startError");
 
-        if (!pass)
-          return displayError("passError", "Passing year is required.");
-        if (!/^(19|20)\d{2}$/.test(pass))
-          return displayError("passError", "Enter a valid year (e.g., 2023).");
-        if (+start && +pass && +start > +pass)
-          return displayError(
-            "passError",
-            "Passing year cannot be before start year."
-          );
+      //   if (!pass)
+      //     return displayError("passError", "Passing year is required.");
+      //   if (!/^(19|20)\d{2}$/.test(pass))
+      //     return displayError("passError", "Enter a valid year (e.g., 2023).");
+      //   if (+start && +pass && +start > +pass)
+      //     return displayError(
+      //       "passError",
+      //       "Passing year cannot be before start year."
+      //     );
+      //   clearError("passError");
+      // }
+       function validateYears() {
+    const start = startyearEl.value.trim();
+    const pass = passyearEl.value.trim();
+    const yearRegex = /^(19|20)\d{2}$/;
+    let startValid = false;
+    let passValid = false;
+
+    // Validate start year
+    if (!start) {
+      displayError("startError", "Start year is required.");
+    } else if (!yearRegex.test(start)) {
+      displayError("startError", "Enter a valid start year (e.g., 2019).");
+    } else {
+      clearError("startError");
+      startValid = true;
+    }
+
+    // Validate passing year
+    if (!pass) {
+      displayError("passError", "Passing year is required.");
+    } else if (!yearRegex.test(pass)) {
+      displayError("passError", "Enter a valid passing year (e.g., 2023).");
+    } else {
+      clearError("passError");
+      passValid = true;
+    }
+
+    // If both are valid, check chronological order
+    if (startValid && passValid) {
+      const s = Number(start);
+      const p = Number(pass);
+      if (s > p) {
+        displayError("passError", "Passing year cannot be before start year.");
+      } else {
         clearError("passError");
       }
+    }
+  }
 
       // ===== Add Blur Events (runs when user leaves field) =====
       fullnameEl.addEventListener("blur", validateName);
@@ -352,8 +418,8 @@
         );
 
         if (!errors) {
-          alert("🎓 Form submitted successfully!");
-          form.reset();
+         
+          form.submit();
           document
             .querySelectorAll("small")
             .forEach((s) => (s.textContent = ""));
@@ -389,22 +455,17 @@
         });
       });
 
-      //window and document events
-      window.addEventListener("load", () => {
-        alert(" Welcome! Please fill out your UG Degree details carefully");
-      });
-
       window.addEventListener("resize", () => {
         alert("window resize");
       });
 
       //form event
-      degree.addEventListener("change", function () {
-        alert(this.value);
-      });
-      form.addEventListener("reset", () => {
-        alert("Form has been cleared!");
-      });
+      // degree.addEventListener("change", function () {
+      //   alert(this.value);
+      // });
+      // form.addEventListener("reset", () => {
+      //   alert("Form has been cleared!");
+      // });
     </script>
   </body>
 </html>

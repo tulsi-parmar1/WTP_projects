@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -286,15 +290,22 @@
         </td>
       </tr>
     </table>
-
     <!-- Navbar -->
     <div class="navbar">
       <a href="#home">Home</a> | <a href="#about">About Us</a> |
       <a href="#admissions">Admissions</a> |
       <a href="#departments">Departments</a> | <a href="#events">Events</a> |
       <a href="#contact">Contact</a> |
-      <a href="underGraduateDataRes.html">UndergraduateData</a> |
-      <a href="Calc.html">Calculator</a>
+      <!-- <a href="underGraduateDataRes.html">UndergraduateData</a> | -->
+       <a href="showData.php">UndergraduateData</a> |
+      <a href="Calc.php">Calculator</a> |
+      <!-- <a href="login.php">login</a> |
+      <a href="logout.php">logout</a> -->
+       <?php if(!isset($_SESSION['user_id'])): ?>
+      <a href="login.php">Login</a> |
+  <?php else: ?>
+      <a href="logout.php">Logout</a> |
+  <?php endif; ?>
     </div>
 
     <!-- Main Content -->
