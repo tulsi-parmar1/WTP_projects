@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+  <head>
+    <meta charset="UTF-8" />
+    <title>GMCA SPA</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+    <script src="./app.js"></script>
+  </head>
+  <style>
+    body {
+      background-color: #f2f8ff;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <body>
+    <!-- Header -->
+    <div ng-include="'header.php'"></div>
+
+    <!-- Middle content -->
+    <div ng-view></div>
+
+    <!-- Footer -->
+    <div ng-include="'footer.php'"></div>
+  </body>
+</html>

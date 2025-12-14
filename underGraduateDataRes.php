@@ -1,27 +1,16 @@
-<?php
-session_start();
-if(!isset($_SESSION['user_id'])){
-    // user is NOT logged in
-    header("Location: login.php");
-    exit();
-}
-else{
-   $id = $_GET['id'] ?? null;
-  if ($id) {
-    include("db.php");
-    $query = "SELECT * FROM students_education WHERE id = $id";
-    $result = mysqli_query($conn, $query);
-    $data = mysqli_fetch_assoc($result);
-}
-}
-?>
+
+
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UG Degree Information Form - GMCA</title>
-    <style>
+<html lang="en" ng-app="ugApp">
+<head>
+  <meta charset="UTF-8">
+  <title>UG Degree Information Form - GMCA</title>
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <!-- SAME CSS -->
+   <style>
       /* ===== Base Styling ===== */
       body {
         margin: 0;
@@ -174,298 +163,166 @@ else{
         }
       }
     </style>
-  </head>
+</head>
 
-  <body>
-    <main>
-      <div class="header">
-        <div class="back-btn">
-          <button onclick="history.back()">← Back</button>
-        </div>
-        <h1>Undergraduate Degree Information</h1>
-        <p>
-          Fill in your degree details carefully. All fields marked
-          <strong>*</strong> are mandatory.
-        </p>
-      </div>
+<body ng-controller="UGCtrl">
+  <div class="back-btn">
+        <button onclick="window.location.
+        href='./showData.php'">← back</button>
+    </div>
+ 
+<main>
+<form method="POST" action="save.php">
 
-      <form id="ugForm" method="POST" action="save.php">
-          <legend>Personal Information</legend>
+<input type="hidden" name="student_id"
+       value="<?php echo $_SESSION['user_id']; ?>">
 
-          <label for="fullname">Full Name <strong>*</strong></label>
-          <input type="text" name="fullname" id="fullname" 
-          value="<?php echo $data['fullname'] ?? ''; ?>"
-           />
-          <small id="nameError"></small>
+<!-- FULL NAME -->
+<label>Full Name *</label>
+<input type="text" name="fullname"
+       ng-model="ug.fullname"
+       ng-blur="validateName()"
+       value="<?php echo $data['fullname'] ?? ''; ?>">
+<small ng-show="errors.name">{{errors.name}}</small>
+<small ng-hide="!errors.name">{{errors.name}}</small>
 
-          <label for="email">Email <strong>*</strong></label>
-          <input
-            type="email"
-            id="email"
-            value="<?php echo $data['email'] ?? ''; ?>"
-            name="email"
-            
-            placeholder="you@example.com"
-          />
-          <small id="emailError"></small>
+<!-- EMAIL -->
+<label>Email *</label>
+<input type="email" name="email"
+       ng-model="ug.email"
+       ng-blur="validateEmail()"
+       value="<?php echo $data['email'] ?? ''; ?>">
+<small ng-show="errors.email">{{errors.email}}</small>
+<small ng-hide="!errors.email">{{errors.email}}</small>
 
-          <label for="phone">Phone Number <strong>*</strong></label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value="<?php echo $data['phone'] ?? ''; ?>"
-            placeholder="10 digit mobile"
-          />
-          <small id="phoneError"></small>
-        </fieldset>
+<!-- PHONE -->
+<label>Phone *</label>
+<input type="tel" name="phone"
+       ng-model="ug.phone"
+       ng-blur="validatePhone()"
+       value="<?php echo $data['phone'] ?? ''; ?>">
+<small ng-show="errors.phone">{{errors.phone}}</small>
+<small ng-hide="!errors.phone">{{errors.phone}}</small>
 
-        <fieldset>
-          <legend>Degree Details</legend>
+<!-- COLLEGE -->
+<label>College *</label>
+<input type="text" name="college_name"
+       ng-model="ug.college"
+       ng-blur="validateCollege()"
+       value="<?php echo $data['college_name'] ?? ''; ?>">
+<small ng-show="errors.college">{{errors.college}}</small>
+<small ng-hide="!errors.college">{{errors.college}}</small>
 
-          <label for="college"
-            >College / Institute Name <strong>*</strong></label
-          >
-          <input
-            type="text"
-            id="college_name"
-            value="<?php echo $data['college_name'] ?? ''; ?>"
-            name="college_name"
-            placeholder="Name of your college"
-          />
-          <small id="collegeError"></small>
-
-          <label for="degree">Degree <strong>*</strong></label>
-  
-    <select id="degree" name="degree">
-    <option value="" disabled <?php if(!isset($data['degree'])) echo 'selected'; ?>>
-        -- Select degree --
-    </option>
-    <option value="BCom" <?php if(($data['degree'] ?? '') == 'BCom') echo 'selected'; ?>>MCA</option>
-    <option value="BBA" <?php if(($data['degree'] ?? '') == 'BBA') echo 'selected'; ?>>MBA</option>
-    <option value="BCA" <?php if(($data['degree'] ?? '') == 'BCA') echo 'selected'; ?>>M.Com</option>
-    <option value="BA"  <?php if(($data['degree'] ?? '') == 'BA')  echo 'selected'; ?>>BA</option>
-    <option value="BSc" <?php if(($data['degree'] ?? '') == 'BSc') echo 'selected'; ?>>B.Sc</option>
-    <option value="Other" <?php if(($data['degree'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
+<!-- DEGREE -->
+<label>Degree *</label>
+<select name="degree"
+        ng-model="ug.degree"
+        ng-change="validateDegree()">
+  <option value="">-- Select Degree --</option>
+  <option>MCA</option>
+  <option>MBA</option>
+  <option>BA</option>
+  <option>BSc</option>
+  <option>Other</option>
 </select>
-          <small id="degreeError"></small>
+<small ng-show="errors.degree">{{errors.degree}}</small>
+<small ng-hide="!errors.degree">{{errors.degree}}</small>
 
-          <label for="startyear">Start Year</label>
-          <input
-            type="number"
-            id="start_year"
-            name="start_year"
-            value="<?php echo $data['start_year'] ?? ''; ?>"
-            placeholder="e.g., 2020"
-          />
-          <small id="startError"></small>
+<!-- START YEAR -->
+<label>Start Year</label>
+<input type="number" name="start_year"
+       ng-model="ug.startYear"
+       ng-blur="validateYears()"
+       value="<?php echo $data['start_year'] ?? ''; ?>">
+<small ng-show="errors.startYear">{{errors.startYear}}</small>
 
-          <label for="passyear">Year of Passing <strong>*</strong></label>
-          <input
-            type="number"
-            id="end_year"
-            value="<?php echo $data['end_year'] ?? ''; ?>"
-            name="end_year"
-            placeholder="e.g., 2023"
-          />
-          <small id="passError"></small>
-        </fieldset>
+<!-- PASS YEAR -->
+<label>Passing Year *</label>
+<input type="number" name="end_year"
+       ng-model="ug.endYear"
+       ng-blur="validateYears()"
+       value="<?php echo $data['end_year'] ?? ''; ?>">
+<small ng-show="errors.endYear">{{errors.endYear}}</small>
+<small ng-hide="!errors.endYear">{{errors.endYear}}</small>
 
-        <div class="btn">
-          <button type="submit" id="submitBtn">Submit</button>
-          </button>
-          <button type="reset">Reset</button>
-        </div>
-      </form>
-    </main>
-    <script>
-      const fullnameEl = document.getElementById("fullname");
-      const emailEl = document.getElementById("email");
-      const phoneEl = document.getElementById("phone");
-      const collegeEl = document.getElementById("college_name");
-      const degreeEl = document.getElementById("degree");
-      const startyearEl = document.getElementById("start_year");
-      const passyearEl = document.getElementById("end_year");
+<!-- STATUS MESSAGE (ng-hide EXTRA) -->
+<p style="color:green" ng-hide="hasErrors">
+✔ All fields are valid
+</p>
 
-      const form = document.getElementById("ugForm");
+<!-- BUTTONS -->
+<div class="btn">
+  <button type="submit" ng-disabled="hasErrors">Submit</button>
+  <button type="reset">Reset</button>
+</div>
 
-      const displayError = (id, msg) =>
-        (document.getElementById(id).textContent = msg);
+</form>
+</main>
 
-      const clearError = (id) => (document.getElementById(id).textContent = "");
+<!-- ANGULAR CONTROLLER -->
+<script>
+var app = angular.module("ugApp", []);
 
-      // ===== Individual Field Validation Functions =====
-      function validateName() {
-        const fullname = fullnameEl.value.trim();
-        if (!fullname)
-          return displayError("nameError", "Full name is required.");
-        if (/\d/.test(fullname))
-          return displayError("nameError", "Name cannot contain numbers.");
-        clearError("nameError");
-      }
+app.controller("UGCtrl", function($scope){
 
-      function validateEmail() {
-        const email = emailEl.value.trim();
-        if (!email) return displayError("emailError", "Email is required.");
-        if (!/^[^ ]+@[^ ]+\.[a-z]{2,3}$/.test(email))
-          return displayError("emailError", "Enter valid email.");
-        clearError("emailError");
-      }
+  $scope.ug = {};
+  $scope.errors = {};
+  $scope.hasErrors = false;
 
-      function validatePhone() {
-        const phone = phoneEl.value.trim();
-        if (!phone) return displayError("phoneError", "Phone number required.");
-        if (!/^[0-9]{10}$/.test(phone))
-          return displayError("phoneError", "Enter valid 10-digit number.");
-        clearError("phoneError");
-      }
-
-      function validateCollege() {
-        const college = collegeEl.value.trim();
-        if (!college)
-          return displayError("collegeError", "College name is required.");
-        clearError("collegeError");
-      }
-
-      function validateDegree() {
-        const degree = degreeEl.value;
-        if (!degree)
-          return displayError("degreeError", "Please select a degree.");
-        clearError("degreeError");
-      }
-
-      // function validateYears() {
-      //   const start = startyearEl.value.trim();
-      //   const pass = passyearEl.value.trim();
-
-      //   if (!start)
-      //     return displayError("startError", "Start year is required.");
-      //   if (!/^(19|20)\d{2}$/.test(start))
-      //     return displayError("startError", "Enter a valid year (e.g., 2020).");
-      //   clearError("startError");
-
-      //   if (!pass)
-      //     return displayError("passError", "Passing year is required.");
-      //   if (!/^(19|20)\d{2}$/.test(pass))
-      //     return displayError("passError", "Enter a valid year (e.g., 2023).");
-      //   if (+start && +pass && +start > +pass)
-      //     return displayError(
-      //       "passError",
-      //       "Passing year cannot be before start year."
-      //     );
-      //   clearError("passError");
-      // }
-       function validateYears() {
-    const start = startyearEl.value.trim();
-    const pass = passyearEl.value.trim();
-    const yearRegex = /^(19|20)\d{2}$/;
-    let startValid = false;
-    let passValid = false;
-
-    // Validate start year
-    if (!start) {
-      displayError("startError", "Start year is required.");
-    } else if (!yearRegex.test(start)) {
-      displayError("startError", "Enter a valid start year (e.g., 2019).");
-    } else {
-      clearError("startError");
-      startValid = true;
-    }
-
-    // Validate passing year
-    if (!pass) {
-      displayError("passError", "Passing year is required.");
-    } else if (!yearRegex.test(pass)) {
-      displayError("passError", "Enter a valid passing year (e.g., 2023).");
-    } else {
-      clearError("passError");
-      passValid = true;
-    }
-
-    // If both are valid, check chronological order
-    if (startValid && passValid) {
-      const s = Number(start);
-      const p = Number(pass);
-      if (s > p) {
-        displayError("passError", "Passing year cannot be before start year.");
-      } else {
-        clearError("passError");
-      }
-    }
+  function checkErrors(){
+    $scope.hasErrors = Object.keys($scope.errors).length > 0;
   }
 
-      // ===== Add Blur Events (runs when user leaves field) =====
-      fullnameEl.addEventListener("blur", validateName);
-      emailEl.addEventListener("blur", validateEmail);
-      phoneEl.addEventListener("blur", validatePhone);
-      collegeEl.addEventListener("blur", validateCollege);
-      degreeEl.addEventListener("blur", validateDegree);
-      startyearEl.addEventListener("blur", validateYears);
-      passyearEl.addEventListener("blur", validateYears);
+  $scope.validateName = function(){
+    if(!$scope.ug.fullname)
+      $scope.errors.name="Name required";
+    else if(/\d/.test($scope.ug.fullname))
+      $scope.errors.name="No numbers allowed";
+    else delete $scope.errors.name;
+    checkErrors();
+  };
 
-      // ===== On Submit (final validation check) =====
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        validateName();
-        validateEmail();
-        validatePhone();
-        validateCollege();
-        validateDegree();
-        validateYears();
+  $scope.validateEmail = function(){
+    let r=/^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+    if(!$scope.ug.email)
+      $scope.errors.email="Email required";
+    else if(!r.test($scope.ug.email))
+      $scope.errors.email="Invalid email";
+    else delete $scope.errors.email;
+    checkErrors();
+  };
 
-        const errors = [...document.querySelectorAll("small")].some(
-          (s) => s.textContent !== ""
-        );
+  $scope.validatePhone = function(){
+    if(!/^[0-9]{10}$/.test($scope.ug.phone||""))
+      $scope.errors.phone="10 digit phone required";
+    else delete $scope.errors.phone;
+    checkErrors();
+  };
 
-        if (!errors) {
-         
-          form.submit();
-          document
-            .querySelectorAll("small")
-            .forEach((s) => (s.textContent = ""));
-        }
-      });
-      //key up and key down events
-      const inputs = Array.from(document.querySelectorAll("input, select"));
-      inputs.forEach((input, index) => {
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "ArrowDown") {
-            e.preventDefault();
-            if (index < inputs.length - 1) {
-              inputs[index + 1].focus();
-            }
-          } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            if (index > 0) {
-              inputs[index - 1].focus();
-            }
-          }
-        });
-      });
+  $scope.validateCollege = function(){
+    if(!$scope.ug.college)
+      $scope.errors.college="College required";
+    else delete $scope.errors.college;
+    checkErrors();
+  };
 
-      //mouse hover and mouse down
-      inputs.forEach((input) => {
-        input.addEventListener("mouseover", () => {
-          input.style.borderColor = "#43a047";
-          input.style.boxShadow = "10 10 8px rgba(67,160,71,0.4)";
-        });
-        input.addEventListener("mouseout", () => {
-          input.style.borderColor = "#ccc";
-          input.style.boxShadow = "none";
-        });
-      });
+  $scope.validateDegree = function(){
+    if(!$scope.ug.degree)
+      $scope.errors.degree="Select degree";
+    else delete $scope.errors.degree;
+    checkErrors();
+  };
 
-      window.addEventListener("resize", () => {
-        alert("window resize");
-      });
+  $scope.validateYears = function(){
+    if($scope.ug.startYear && $scope.ug.endYear &&
+       $scope.ug.startYear > $scope.ug.endYear)
+      $scope.errors.endYear="Passing year must be greater";
+    else delete $scope.errors.endYear;
+    checkErrors();
+  };
 
-      //form event
-      // degree.addEventListener("change", function () {
-      //   alert(this.value);
-      // });
-      // form.addEventListener("reset", () => {
-      //   alert("Form has been cleared!");
-      // });
-    </script>
-  </body>
+});
+</script>
+
+</body>
 </html>
